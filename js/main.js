@@ -28,16 +28,25 @@ function addItemTodo(text) {
 
   list.insertBefore(item, list.childNodes[0]);
 
-  remove.addEventListener('click', removeTask);
-  complete.addEventListener('click', completedTask);
+  remove.addEventListener('click', removeItem);
+  complete.addEventListener('click', completeItem);
 };
 
-function removeTask() {
-  console.log('REMOVE!')
+function removeItem() {
+  const item = this.parentNode.parentNode;
+  const parent = item.parentNode;
+
+  parent.removeChild(item);
 };
 
-function completedTask() {
-  console.log('COMPLETE!')
-}
+function completeItem() {
+  const item = this.parentNode.parentNode;
+  const parent = item.parentNode;
+  const id = parent.id;
+  const target = (id === 'todo') ? document.getElementById('completed') : document.getElementById('todo');
+
+  parent.removeChild(item);
+  target.insertBefore(item, target.childNodes[0]);
+};
 
 document.getElementById('add').addEventListener('click', handleAddItem);
