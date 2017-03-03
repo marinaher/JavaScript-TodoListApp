@@ -9,6 +9,20 @@ const completeSVG = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns
 
 renderTodoList();
 
+document.getElementById('add').addEventListener('click', function() {
+  var value = document.getElementById('item').value;
+  if (value) {
+    addItem(value);
+  }
+});
+
+document.getElementById('item').addEventListener('keydown', function(e) {
+  var value = this.value;
+  if (e.code === 'Enter' && value) {
+    addItem(value);
+  }
+});
+
 function renderTodoList() {
   // If arrays are empty, returns nothing
   if (!data.todo.length && !data.completed.length) return;
@@ -19,7 +33,7 @@ function renderTodoList() {
   }
 
   for (var j = 0; j < data.completed.length; j++) {
-    var value = data.completed[i];
+    var value = data.completed[j];
     addItemToDOM(value, true);
   }
 };
@@ -49,25 +63,16 @@ function addItemToDOM(text, completed) {
   complete.addEventListener('click', completeItem);
 };
 
-function handleAddItem(e) {
-  const value = document.getElementById('item').value;
+function addItem(value) {
+  addItemToDOM(value);
+  document.getElementById('item').value = '';
 
-  if (value) {
-    addItemToDOM(value);
-    document.getElementById('item').value = '';
-  }
+  data.todo.push(value);
+  dataObjectUpdated();
 };
 
-function addItem(e) {
-  const value = this.value;
-
-  if (e.code === 'Enter' && value) {
-    addItemToDOM(value);
-    document.getElementById('item').value = '';
-
-    data.todo.push(value);
-    dataObjectUpdated();
-  }
+function dataObjectUpdated() {
+  localStorage.setItem('todoList', JSON.stringify(data));
 };
 
 function removeItem() {
@@ -77,9 +82,9 @@ function removeItem() {
   const value = item.innerText;
 
   if (id === 'todo') {
-    data.todo.splice(data.todo.indexOf(value, 1));
+    data.todo.splice(data.todo.indexOf(value), 1);
   } else {
-    data.completed.splice(data.completed.indexOf(value, 1));
+    data.completed.splice(data.completed.indexOf(value), 1);
   }
 
   dataObjectUpdated();
@@ -92,25 +97,18 @@ function completeItem() {
   const parent = item.parentNode;
   const id = parent.id;
   const value = item.innerText;
-  const target = (id === 'todo') ? document.getElementById('completed') : document.getElementById('todo');
 
   if (id === 'todo') {
-    data.todo.splice(data.todo.indexOf(value, 1));
+    data.todo.splice(data.todo.indexOf(value), 1);
     data.completed.push(value);
   } else {
-    data.completed.splice(data.completed.indexOf(value, 1));
+    data.completed.splice(data.completed.indexOf(value), 1);
     data.todo.push(value);
   }
 
   dataObjectUpdated();
+  const target = (id === 'todo') ? document.getElementById('completed') : document.getElementById('todo');
 
   parent.removeChild(item);
   target.insertBefore(item, target.childNodes[0]);
 };
-
-function dataObjectUpdated() {
-  localStorage.setItem('todoList', JSON.stringify(data));
-};
-
-document.getElementById('add').addEventListener('click', handleAddItem);
-document.getElementById('item').addEventListener('keydown', addItem);
